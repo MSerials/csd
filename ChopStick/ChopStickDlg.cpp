@@ -819,7 +819,8 @@ UINT CChopStickDlg::Procedure()
 	StartLaser();
 	DWORD LaserTick = GetTickCount();
 	StartRotation();
-	DelayForLaser(LaserTick,(DWORD)g.ini.m_DelayLaserTrigger);
+	int DelayTime = g.ini.m_DelayLaserTrigger < 230 ? 230 : g.ini.m_DelayLaserTrigger;
+	DelayForLaser(LaserTick,(DWORD)DelayTime);
 	StartCamera();
 	flag = RotationBack();							if (NoError != flag) return flag;
 	for (; g.g_evtImageProc.EventState();)
@@ -1059,4 +1060,13 @@ void CChopStickDlg::OnSelchangeComboSeldir()
 		g.ini.m_direction = UP; pbox->SetCurSel(0);
 	}
 	g.ini.SaveParaFile(PARA_PRJ);
+}
+
+
+BOOL CChopStickDlg::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	if (VK_RETURN == pMsg->wParam)
+		return TRUE;
+	return CDialogEx::PreTranslateMessage(pMsg);
 }

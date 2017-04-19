@@ -121,6 +121,7 @@ public:
 	afx_msg void OnBnClickedButtoncSaveimg();
 	afx_msg void OnBnClickedButtonActive();
 	afx_msg void OnSelchangeComboSeldir();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 extern CChopStickDlg * pMainFrm;
