@@ -819,7 +819,7 @@ UINT CChopStickDlg::Procedure()
 	StartLaser();
 	DWORD LaserTick = GetTickCount();
 	StartRotation();
-	int DelayTime = g.ini.m_DelayLaserTrigger < 230 ? 230 : g.ini.m_DelayLaserTrigger;
+	int DelayTime = g.ini.m_DelayLaserTrigger < 270 ? 270 : g.ini.m_DelayLaserTrigger;
 	DelayForLaser(LaserTick,(DWORD)DelayTime);
 	StartCamera();
 	flag = RotationBack();							if (NoError != flag) return flag;
