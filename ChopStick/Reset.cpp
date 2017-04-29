@@ -81,7 +81,27 @@ UINT Reset::OriginThread(LPVOID lp)
 	{
 		pDlg->ErrorShow(L"复位失败，急停按钮按下");
 	}
-
+#ifdef PRINTED_VERSION2
+	res = g.mc.PrintStepRun();
+	if (res == TIMEOUT)
+	{
+		pDlg->ErrorShow(L"请检查电机是否接好，印花纸感应器是否接好");
+	}
+	else if (res == EMERGNCY)
+	{
+		pDlg->ErrorShow(L"复位失败，急停按钮按下");
+	}
+	g.mc.WriteOutPutBit(OUT_滚花气缸,OFF);
+	g.mc.WriteOutPutBit(OUT_拖住气缸, OFF);
+	g.mc.WriteOutPutBit(OUT_滚花气缸, OFF);
+	g.mc.WriteOutPutBit(OUT_拖住气缸, OFF);
+	g.mc.WriteOutPutBit(OUT_滚花气缸, OFF);
+	g.mc.WriteOutPutBit(OUT_滚花气缸, OFF);
+	g.mc.WriteOutPutBit(OUT_滚花气缸, OFF);
+	g.mc.WriteOutPutBit(OUT_拖住气缸, OFF);
+	g.mc.WriteOutPutBit(OUT_拖住气缸, OFF);
+	g.mc.WriteOutPutBit(OUT_拖住气缸, OFF);
+#endif
 	if (!res) { g.Controller.SysState = NoError; pDlg->ErrorShow(L"复位");}
 	pDlg->isOrigin = false;
 	return 0;

@@ -156,6 +156,9 @@ BOOL CChopStickDlg::OnInitDialog()
 	Veritfy();
 
 	InitUI();
+#ifdef PRINTED_VERSION2
+	startPrintThread();
+#endif
 
 	startVideoCaputreThread();
 
@@ -660,10 +663,52 @@ UINT CChopStickDlg::VideoCaptureThread(LPVOID lParam)
 }
 
 
+bool  CChopStickDlg::startPrintThread()
+{
+	CWinThread* T = AfxBeginThread(PrintThread, this, THREAD_PRIORITY_ABOVE_NORMAL, 0, 0, NULL);
+	if (!T) return false;
+	return true;
+}
+
+UINT CChopStickDlg::PrintThread(LPVOID lParam)
+{
+	CChopStickDlg* pDlg = (CChopStickDlg*)lParam;
+	for (;;)
+	{
+		if (WAIT_OBJECT_0 == ::WaitForSingleObject(g.g_evtPrint.evt, 1))
+		{
+			switch (g.mc.actioninfo[g.mc.caculate_position(pDlg->m_ChopstickCounter, g_PrintPos)].RoationInfo)
+			{
+				case DOWN:
+				case LEFT:
+				case RIGHT:
+				case UP:
+				{
+
+					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_拖住气缸, ON);
+					Sleep(180);
+					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_滚花气缸, ON);
+					Sleep(1000);
+					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_拖住气缸, OFF);
+					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_滚花气缸, OFF);
+					Sleep(1100);
+					g.mc.PrintStepRun();
+				}
+			break;
+			default:break;
+			}
+		}
+			g.g_evtPrint.ResetEvent();
+	}
+
+	return 0;
+}
+
+
 //高级别
 bool CChopStickDlg::startImageDealThread()
 {
-	CWinThread* T = AfxBeginThread(ImageDealThread, this, THREAD_PRIORITY_HIGHEST, 0, 0, NULL);
+	CWinThread* T = AfxBeginThread(ImageDealThread, this, THREAD_PRIORITY_ABOVE_NORMAL, 0, 0, NULL);
 	if (!T) return false;
 	return true;
 }
@@ -715,9 +760,9 @@ UINT CChopStickDlg::ProcThread(LPVOID lParam)
 				{
 				case NoError:			pDlg->ErrorShow(L"正常运行");								break;
 #ifdef PRINTED_VERSION
-				case SenorUp:
+			//	case SenorUp:
 
-					pMainDlg->showError(L"发现手指夹子或者印花机夹子没打开！"); break;
+				//	pMainDlg->showError(L"发现手指夹子或者印花机夹子没打开！"); break;
 #endif
 #ifdef LASER_VERSION
 					//		pMainDlg->showError(L"上限感应器不亮，没通气或者感应器松动"); break;
@@ -729,6 +774,7 @@ UINT CChopStickDlg::ProcThread(LPVOID lParam)
 				case NOCHOPSTICK:		pDlg->ErrorShow(L"没检测到筷子");							break;
 				case THIRDMOTORTIMEOUT:	pDlg->ErrorShow(L"印花电机超时");							break;
 				case EMERGNCY:			pDlg->ErrorShow(L"急停按钮被按下");							break;
+				case PRINT_TIMEOUT:		pDlg->ErrorShow(L"印花机印刷超时"); break;
 				default:break;
 				}
 			}
@@ -811,6 +857,64 @@ void CChopStickDlg::StartCamera()
 }
 
 
+
+#ifdef PRINTED_VERSION2
+
+UINT CChopStickDlg::Procedure()
+{
+	UINT flag = CheckBeforeProcedure();				if (NoError != flag) return flag; 
+	flag = g.mc.ConveyorStepRun();					if (NoError != flag) return flag;
+	DWORD PrintTick = GetTickCount();
+	g.g_evtPrint.SetEvent();
+	StartRotation(); 
+	Sleep(200);
+	StartCamera();
+	RotationBack();
+	for (; g.g_evtImageProc.EventState();)
+	{
+		//	DWORD StartTick = GetTickCount();
+		if ((GetTickCount() - PrintTick) > 20000)
+		{
+			return TIMEOUTIMG;
+			//	break;
+		}
+	}
+	g.mc.actioninfo[g.mc.caculate_position(m_ChopstickCounter, g_CameraPos)].RoationInfo = m_ImageResult;
+	DWORD EndTickTime = GetTickCount();
+	if ((EndTickTime - PrintTick) < g.ini.m_markdelay)
+	{
+		Sleep(g.ini.m_markdelay - (EndTickTime - PrintTick));
+	}
+
+	//检查是否到位
+	for (; g.g_evtPrint.EventState();)
+	{
+		//	DWORD StartTick = GetTickCount();
+		if ((GetTickCount() - PrintTick) > 20000)
+		{
+			return PRINT_TIMEOUT;
+			//	break;
+		}
+	}
+
+	m_ChopstickCounter++;
+	m_stopCounter++;
+	if (m_stopCounter > 10) { flag = NOCHOPSTICK; g.mc.WriteOutPutBit(OUT_ALM, ON); };
+	UpdateUI();
+	//	UpdateData(FALSE);
+	return flag;
+} 
+
+
+
+
+
+
+#endif
+
+
+#ifdef LAYSER_VERSION
+
 UINT CChopStickDlg::Procedure()
 {
 	UINT flag = CheckBeforeProcedure();				if (NoError != flag) return flag;
@@ -820,7 +924,11 @@ UINT CChopStickDlg::Procedure()
 	DWORD LaserTick = GetTickCount();
 	StartRotation();
 	int DelayTime = g.ini.m_DelayLaserTrigger < 270 ? 270 : g.ini.m_DelayLaserTrigger;
+#ifdef LASER_VERSION
 	DelayForLaser(LaserTick,(DWORD)DelayTime);
+#else
+	Sleep(DelayTime);
+#endif
 	StartCamera();
 	flag = RotationBack();							if (NoError != flag) return flag;
 	for (; g.g_evtImageProc.EventState();)
@@ -849,6 +957,7 @@ UINT CChopStickDlg::Procedure()
 	return flag;
 }
 
+#endif
 
 #ifdef LASER_VERSION
 void CChopStickDlg::DelayForLaser(DWORD tick, int Wait)
@@ -883,19 +992,26 @@ void CChopStickDlg::StartRotation()
 
 void CChopStickDlg::StartLaser()
 {
+#ifdef PRINTED_VERSION
+	return;
+
+#endif
+
+#ifdef LAYSER_VERSION
 	switch (g.mc.actioninfo[g.mc.caculate_position(m_ChopstickCounter, g_LaserPos)].RoationInfo)
 	{
 	case UP:
 	case DOWN:
 	case LEFT:
 	case RIGHT:
-		m_stopCounter = 0;
+//		m_stopCounter = 0;
 		Sleep(100);
 		for (int i = 0; i < MAX_COUNTER; i++) { write_output(OUT_LASER_ACTION, ON); }
 		break;
 	case NOOBJECT:break;
 	default:break;
 	}
+#endif
 }
 
 UINT CChopStickDlg::RotationBack()
@@ -903,10 +1019,10 @@ UINT CChopStickDlg::RotationBack()
 	UINT flag = NoError;
 	switch (g.mc.actioninfo[g.mc.caculate_position(m_ChopstickCounter, g_RotationCylPos)].RoationInfo)
 	{
-	case DOWN:if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = TIMEOUT; Sleep(50); for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); } /*if (!wait_sensor_timeout(IN_TRAP_IS_OPEN, 2000))flag = SenorUp; */Sleep(190);   g.mc.CounterClock180();	if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = MOTOR; Sleep(150); break;
-	case LEFT:if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = TIMEOUT; Sleep(50); for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); } /* if (!wait_sensor_timeout(IN_TRAP_IS_OPEN, 2000))flag = SenorUp;*/ Sleep(190); g.mc.Clock90();				if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = MOTOR; Sleep(150);  break;
-	case RIGHT:if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = TIMEOUT; Sleep(50); for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); } /*if (!wait_sensor_timeout(IN_TRAP_IS_OPEN, 2000))flag = SenorUp;*/ Sleep(190); g.mc.CounterClock90();	if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = MOTOR; Sleep(150);  break;
-	case UP: for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); }  break;
+	case DOWN:m_stopCounter = 0; if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = TIMEOUT; Sleep(50); for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); } /*if (!wait_sensor_timeout(IN_TRAP_IS_OPEN, 2000))flag = SenorUp; */Sleep(190);   g.mc.CounterClock180();	if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = MOTOR; Sleep(150); break;
+	case LEFT:m_stopCounter = 0; if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = TIMEOUT; Sleep(50); for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); } /* if (!wait_sensor_timeout(IN_TRAP_IS_OPEN, 2000))flag = SenorUp;*/ Sleep(190); g.mc.Clock90();				if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = MOTOR; Sleep(150);  break;
+	case RIGHT:m_stopCounter = 0; if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = TIMEOUT; Sleep(50); for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); } /*if (!wait_sensor_timeout(IN_TRAP_IS_OPEN, 2000))flag = SenorUp;*/ Sleep(190); g.mc.CounterClock90();	if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = MOTOR; Sleep(150);  break;
+	case UP:m_stopCounter = 0;  for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); }  break;
 	default:break;
 	}
 	return flag;

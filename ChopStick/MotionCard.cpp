@@ -112,7 +112,6 @@ inline BOOL CMotionCard::Stop(short Bit)
 BOOL CMotionCard::ScanMotionCard(HWND hWnd, UINT iMsg)
 {
 	::PostMessage(hWnd,MSG_MOTION_CARD,0,0);
-
     return true;
 }
 
@@ -161,7 +160,6 @@ long CMotionCard::UnitToPulse(short iAxis,const double dValue)
 
 CString CMotionCard::GetErrorString()
 {
-
 	return L"OK"; 
 }	
 
@@ -281,6 +279,39 @@ bool CMotionCard::wait_input_inverse(short Bits, DWORD Time)
 	return true;
 }
 
+int CMotionCard::PrintStepRun()
+{
+	DWORD StartTick = GetTickCount();
+	for (int i = 0; i < MAX_COUNTER; i++) WriteOutPutBit(OUT_印花机电机, ON);
+	for (; !d1000_in_bit(IN_PRINTED_SENSOR);) //第二个感应器
+	{
+		if (::WaitForSingleObject(g.g_evtEStop.evt, 0) == WAIT_OBJECT_0)
+		{
+			for (int i = 0; i < MAX_COUNTER; i++) WriteOutPutBit(OUT_印花机电机, OFF);
+			return EMERGNCY;
+		}
+		if ((GetTickCount() - StartTick) > 2000)
+		{
+			for (int i = 0; i < MAX_COUNTER; i++) WriteOutPutBit(OUT_印花机电机, OFF);
+			return TIMEOUT;
+		}
+	}
+	for (; d1000_in_bit(IN_PRINTED_SENSOR);) //第二个感应器
+	{
+		if (::WaitForSingleObject(g.g_evtEStop.evt, 0) == WAIT_OBJECT_0)
+		{
+			for (int i = 0; i < MAX_COUNTER; i++) WriteOutPutBit(OUT_印花机电机, OFF);
+			return EMERGNCY;
+		}
+		if ((GetTickCount() - StartTick) > 5000)
+		{
+			for (int i = 0; i < MAX_COUNTER; i++) WriteOutPutBit(OUT_印花机电机, OFF);
+			return TIMEOUT;
+		}
+	}
+	for (int i = 0; i < MAX_COUNTER; i++) WriteOutPutBit(OUT_印花机电机, OFF);
+	return 0;
+}
 
 
 int CMotionCard::Clock180()
@@ -483,8 +514,8 @@ int CMotionCard::ConveyorStepRun()
 {
 	for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); }
 #ifdef PRINTED_VERSION
-	int tmp = m_spinwise2 * ini->m_MotorSpinWaves1;
-	start_t_move(SECOND_MOTOR, tmp, ini->m_MotorSpinSpeed1 / 10, ini->m_MotorSpinSpeed1, 0.05);
+	int tmp = g.ini.m_MotorSpinWaves1;//g.ini.m_MotorSpinWaves1
+	start_t_move(SECOND_MOTOR, tmp, g.ini.m_MotorSpinSpeed1 / 10, g.ini.m_MotorSpinSpeed1, 0.05);
 	return 0;
 #endif
 #ifdef LASER_VERSION
@@ -532,6 +563,53 @@ int CMotionCard::ConveyorStepRun()
 	d1000_decel_stop(SECOND_MOTOR);
 	return 0;
 #endif
+
+#ifdef PRINTED_VERSION2
+
+	if (!WaitMotorTimeout(FIRST_MOTOR, 10000)) return TIMEOUT;
+	d1000_start_tv_move(SECOND_MOTOR, g.ini.m_MotorSpinSpeed1 / 10, g.ini.m_MotorSpinSpeed1, 0.05);
+	DWORD StartTick = GetTickCount();
+	for (; !d1000_in_bit(SECOND_ORIGIN_SENSOR);) //第二个感应器
+	{
+		if (::WaitForSingleObject(g.g_evtEStop.evt, 0) == WAIT_OBJECT_0)
+		{
+			d1000_immediate_stop(SECOND_MOTOR);
+			return EMERGNCY;
+		}
+		if ((GetTickCount() - StartTick) > 500)
+		{
+			d1000_immediate_stop(SECOND_MOTOR);
+			return TIMEOUT;
+		}
+	}
+	for (; d1000_in_bit(SECOND_ORIGIN_SENSOR);) //第二个感应器
+	{
+		if (::WaitForSingleObject(g.g_evtEStop.evt, 0) == WAIT_OBJECT_0)
+		{
+			d1000_immediate_stop(SECOND_MOTOR);
+			return EMERGNCY;
+		}
+		if ((GetTickCount() - StartTick) > 1000)
+		{
+			d1000_immediate_stop(SECOND_MOTOR);
+			return TIMEOUT;
+		}
+	}
+	if (g.ini.m_stoptime < 10) {
+		d1000_decel_stop(SECOND_MOTOR);
+		return 0;
+	}
+	int delay = g.ini.m_stoptime / 10;
+	for (int i = 0; i<10; i++)
+	{
+		long long tmpspeed = 9 * d1000_get_speed(SECOND_MOTOR);
+		d1000_change_speed(SECOND_MOTOR, tmpspeed / 10);
+		Sleep(delay);
+	}
+	d1000_decel_stop(SECOND_MOTOR);
+	return 0;
+#endif
+
 }
 
 int CMotionCard::FirstMotorStepRunCW()

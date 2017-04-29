@@ -53,6 +53,11 @@ protected:
 	bool isVideo;
 	static UINT VideoCaptureThread(LPVOID lParam);
 
+
+	bool  startPrintThread();
+	static UINT PrintThread(LPVOID lParam);
+
+
 	bool startImageDealThread();
 	bool isDeal;
 	static UINT ImageDealThread(LPVOID lParam);

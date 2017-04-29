@@ -77,6 +77,10 @@
 #define IDC_EDIT_STOPTIME               1038
 #define IDC_EDIT_EXPOSURE2              1039
 #define IDC_EDIT_DELAYLASER             1039
+#define IDC_BUTTON_MOTOR3               1040
+#define IDC_BUTTON_ROTATION_CYL         1041
+#define IDC_BUTTON_CYL4                 1042
+#define IDC_BUTTON_HOLD_CYL             1042
 
 // Next default values for new objects
 // 

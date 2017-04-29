@@ -40,5 +40,8 @@ public:
 	afx_msg void OnBnClickedButtonShow();
 	afx_msg void OnSelchangeComboSelthemethod();
 	afx_msg void OnBnClickedButtonActivate();
+	afx_msg void OnBnClickedButtonMotor3();
+	afx_msg void OnBnClickedButtonRotationCyl();
+	afx_msg void OnBnClickedButtonHoldCyl();
 };
 extern Set *SetDlg;

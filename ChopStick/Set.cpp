@@ -44,6 +44,9 @@ BEGIN_MESSAGE_MAP(Set, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SHOW, &Set::OnBnClickedButtonShow)
 	ON_CBN_SELCHANGE(IDC_COMBO_SELTHEMETHOD, &Set::OnSelchangeComboSelthemethod)
 	ON_BN_CLICKED(IDC_BUTTON_ACTIVATE, &Set::OnBnClickedButtonActivate)
+	ON_BN_CLICKED(IDC_BUTTON_MOTOR3, &Set::OnBnClickedButtonMotor3)
+	ON_BN_CLICKED(IDC_BUTTON_ROTATION_CYL, &Set::OnBnClickedButtonRotationCyl)
+	ON_BN_CLICKED(IDC_BUTTON_HOLD_CYL, &Set::OnBnClickedButtonHoldCyl)
 END_MESSAGE_MAP()
 
 
@@ -82,7 +85,15 @@ BOOL Set::OnInitDialog()
 		GetDlgItem(IDC_STATIC_THRESCOMP)->SetWindowText(L"二值化补偿");
 	}
 
-
+#ifdef PRINTED_VERSION2
+	GetDlgItem(IDC_BUTTON_ROTATION_CYL)->SetWindowText(L"滚花气缸推出");
+	GetDlgItem(IDC_BUTTON_HOLD_CYL)->SetWindowText(L"托筷子气缸上升");
+	GetDlgItem(IDC_BUTTON_MOTOR3)->SetWindowText(L"滚花电机旋转");
+#else
+	GetDlgItem(IDC_BUTTON_ROTATION_CYL)->ShowWindow(FALSE);
+	GetDlgItem(IDC_BUTTON_HOLD_CYL)->ShowWindow(FALSE);
+	GetDlgItem(IDC_BUTTON_MOTOR3)->ShowWindow(FALSE);
+#endif
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
 }
@@ -149,6 +160,24 @@ void Set::UpdateUI()
 
 	str.Format(_T("%d"), g.ini.m_DelayLaserTrigger);
 	GetDlgItem(IDC_EDIT_DELAYLASER)->SetWindowText(str);
+
+#ifdef PRINTED_VERSION2
+	if(!g.mc.ReadOutputBit(OUT_滚花气缸))
+		GetDlgItem(IDC_BUTTON_ROTATION_CYL)->SetWindowText(L"滚花气缸推出");
+	else
+		GetDlgItem(IDC_BUTTON_ROTATION_CYL)->SetWindowText(L"滚花气缩回");
+
+
+	if(!g.mc.ReadOutputBit(OUT_拖住气缸))
+		GetDlgItem(IDC_BUTTON_HOLD_CYL)->SetWindowText(L"托筷子气缸上升");
+	else
+		GetDlgItem(IDC_BUTTON_HOLD_CYL)->SetWindowText(L"托筷子气缸下降");
+
+	if(!g.mc.ReadOutputBit(OUT_印花机电机))
+		GetDlgItem(IDC_BUTTON_MOTOR3)->SetWindowText(L"滚花电机旋转");
+	else
+		GetDlgItem(IDC_BUTTON_MOTOR3)->SetWindowText(L"滚花电机停止");
+#endif
 }
 
 void Set::OnBnClickedButtonMtr1Back()
@@ -394,4 +423,52 @@ void Set::OnSelchangeComboSelthemethod()
 void Set::OnBnClickedButtonActivate()
 {
 	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void Set::OnBnClickedButtonMotor3()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (g.mc.ReadOutputBit(OUT_印花机电机))
+	{ 
+		for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_印花机电机, OFF);
+		GetDlgItem(IDC_BUTTON_MOTOR3)->SetWindowText(L"滚花电机旋转");
+	}
+	else
+	{
+		for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_印花机电机, ON);
+		GetDlgItem(IDC_BUTTON_MOTOR3)->SetWindowText(L"滚花电机停止");
+	}
+}
+
+
+void Set::OnBnClickedButtonRotationCyl()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (g.mc.ReadOutputBit(OUT_滚花气缸))
+	{
+		for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_滚花气缸,OFF);
+		GetDlgItem(IDC_BUTTON_ROTATION_CYL)->SetWindowText(L"滚花气缸推出");
+	}
+	else
+	{ 
+		for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_滚花气缸, ON);
+		GetDlgItem(IDC_BUTTON_ROTATION_CYL)->SetWindowText(L"滚花气缩回");
+	}
+}
+
+
+void Set::OnBnClickedButtonHoldCyl()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (g.mc.ReadOutputBit(OUT_拖住气缸))
+	{
+		for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_拖住气缸, OFF);
+		GetDlgItem(IDC_BUTTON_HOLD_CYL)->SetWindowText(L"托筷子气缸上升");
+	}
+	else
+	{ 
+		for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_拖住气缸, ON);
+		GetDlgItem(IDC_BUTTON_HOLD_CYL)->SetWindowText(L"托筷子气缸下降");
+	}
 }

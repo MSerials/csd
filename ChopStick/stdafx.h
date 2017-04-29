@@ -52,8 +52,13 @@
 #endif
 
 //#define _TEST
+//激光打标的
+//#define LASER_VERSION
+//电机带动的印花机
+//#define PRINTED_VERSION
+//气缸带动的印花机
+#define PRINTED_VERSION2
 
-#define LASER_VERSION
 #define MAX_COUNTER 1024
 
 #define g_CameraPos				0
@@ -64,6 +69,15 @@
 #define g_LaserPos				3
 #endif
 
+#ifdef PRINTED_VERSION
+#define g_RotationCylPos		2
+#define g_LaserPos				3
+#endif
+
+#ifdef PRINTED_VERSION2
+#define g_RotationCylPos		1
+#define g_PrintPos				4
+#endif
 
 
 #include "source.h"
@@ -82,7 +96,7 @@ enum {
 };
 
 enum {
-	VOID_STATE, TIMEOUT,TIMEOUTIMG,SEVRO,MOTOR,NOCHOPSTICK, THIRDMOTORTIMEOUT, EMERGNCY
+	VOID_STATE, TIMEOUT,TIMEOUTIMG,SEVRO,MOTOR,NOCHOPSTICK, THIRDMOTORTIMEOUT, EMERGNCY, PRINT_TIMEOUT
 };
 
 class exEvent
@@ -123,7 +137,7 @@ public:
 		int MotorState;
 	};
 	_SysController Controller;
-
+	exEvent g_evtPrint;
 	exEvent	g_evtImageProc;
 	exEvent	g_evtActionProc;//
 	exEvent	g_evtGetVideoCapture;

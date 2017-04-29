@@ -65,20 +65,30 @@
 
 //在印花机下面夹住筷子的气缸
 #define IN_HOLD_CHOPSTICK										9
-//#define IN_PUSH_CHOPSTICK_BACK									9    //对应板卡17
-//上料气缸
-//#define IN_PUSH_CHOPSTICK_OUT									11
+//感应到印花纸之后电机停下来
+#define IN_PRINTED_SENSOR										10
+
 
 //启动指示灯
 #define OUT_START_INDICATOR										1
 //暂停指示灯
 #define OUT_PAUSE_INDICATOR										2
-//步进马达开关
-//#define OUT_STEP_MOTOR											3
+//伺服报警
+#define OUT_ALM													3
 //伺服马达开关
 #define OUT_SERVO_MOTOR											4
 //夹子气缸
 #define OUT_TRAP_CYL											5
+
+//压住印花纸的气缸
+#define OUT_滚花气缸											6											
+ 
+//拖住筷子的气缸
+#define OUT_拖住气缸											7
+//印花机电机
+#define OUT_印花机电机											8
+
+
 #ifdef PRINTED_VERSION
 //印花电机//变频器马达
 #define OUT_THIRD_MOTOR											6
@@ -88,14 +98,8 @@
 	#define OUT_LASER_ACTION									6
 #endif
 
-//让筷子一致平行的气缸
-//#define OUT_PUSHCHOPSTICALINE									7
-//推出筷子气缸
-//#define OUT_PUSHOUTCHOPSTIC				     					7
-//夹住筷子的气缸
 #define OUT_HOLD_CHOPSTIC										7
-//伺服报警
-#define OUT_ALM													3
+
 
 #define PUSH_BACK												1
 #define PUSH_OUT												0
@@ -168,6 +172,8 @@ public:
 	virtual int SeconMotorBackToOrigin();
 
 	int ConveyorStepRun();
+
+	int PrintStepRun();
 
 	int FirstMotorStepRunCW();
 
