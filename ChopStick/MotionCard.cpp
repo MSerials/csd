@@ -316,7 +316,7 @@ int CMotionCard::PrintStepRun()
 
 int CMotionCard::Clock180()
 {
-	int tmp = 2 * g.ini.m_MotorSpinWaves;
+	int tmp = 2 * g.ini.m_MotorSpinWavesPerTime;
 	start_t_move(FIRST_MOTOR, tmp, g.ini.m_MotorSpinSpeed / 10, g.ini.m_MotorSpinSpeed, 0.05);
 	return 1;
 }
@@ -324,7 +324,7 @@ int CMotionCard::Clock180()
 
 int CMotionCard::CounterClock180()
 {
-	int tmp = -2 * g.ini.m_MotorSpinWaves;
+	int tmp = -2 * g.ini.m_MotorSpinWavesPerTime;
 	start_t_move(FIRST_MOTOR, tmp, g.ini.m_MotorSpinSpeed / 10, g.ini.m_MotorSpinSpeed, 0.05);
 	return 1;
 }
@@ -332,7 +332,7 @@ int CMotionCard::CounterClock180()
 
 int CMotionCard::CounterClock90()
 {
-	int tmp = -1 * g.ini.m_MotorSpinWaves;
+	int tmp = -1 * g.ini.m_MotorSpinWavesPerTime;
 	start_t_move(FIRST_MOTOR, tmp, g.ini.m_MotorSpinSpeed / 10, g.ini.m_MotorSpinSpeed, 0.05);
 	return 1;
 }
@@ -340,7 +340,7 @@ int CMotionCard::CounterClock90()
 
 int CMotionCard::Clock90()
 {
-	int tmp = g.ini.m_MotorSpinWaves;
+	int tmp = g.ini.m_MotorSpinWavesPerTime;
 	start_t_move(FIRST_MOTOR, tmp, g.ini.m_MotorSpinSpeed / 10, g.ini.m_MotorSpinSpeed, 0.05);
 	return 1;
 }

@@ -838,6 +838,8 @@ UINT CChopStickDlg::OriginlThread(LPVOID lParam)
 
 UINT CChopStickDlg::CheckBeforeProcedure()
 {
+	for(int i = 0;i<MAX_COUNTER;i++) g.mc.WriteOutPutBit(OUT_ÍÏ×¡Æø¸×, OFF);
+	for (int i = 0; i<MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_ÍÏ×¡Æø¸×, OFF);
 	if (!read_input_state(IN_EMERGENCY))	//¼ì²é¼±Í£°´¼ü×´Ì¬
 		return EMERGNCY;
 	if (!read_input_state(IN_SEVRO_ALM))
@@ -851,7 +853,6 @@ UINT CChopStickDlg::CheckBeforeProcedure()
 
 void CChopStickDlg::StartCamera()
 {
-
 	g.g_evtImageProc.SetEvent();
 	return;
 }
