@@ -158,7 +158,7 @@ BOOL CChopStickDlg::OnInitDialog()
 	InitUI();
 #ifdef PRINTED_VERSION2
 	startPrintThread();
-	startPrintMotorThread();
+//	startPrintMotorThread();
 #endif
 
 	startVideoCaputreThread();
@@ -698,7 +698,7 @@ UINT CChopStickDlg::PrintThread(LPVOID lParam)
 					Sleep(g.ini.m_Hold_Cyl_delay1);
 					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_¹ö»¨Æø¸×, OFF);
 					Sleep(g.ini.m_Push_Cyl_delay1);
-				//	g.mc.PrintStepRun();
+					g.mc.PrintStepRun();
 				}
 			break;
 			default:break;
@@ -904,6 +904,7 @@ UINT CChopStickDlg::Procedure()
 	UINT flag = CheckBeforeProcedure();				if (NoError != flag) return flag; 
 	flag = g.mc.ConveyorStepRun();					if (NoError != flag) return flag;
 	DWORD PrintTick = GetTickCount();
+	/*
 	for (; g.g_evtPrintMotor.EventState();)
 	{
 		//	DWORD StartTick = GetTickCount();
@@ -913,6 +914,7 @@ UINT CChopStickDlg::Procedure()
 			//	break;
 		}
 	}
+	*/
 
 	g.g_evtPrint.SetEvent();
 	StartRotation(); 
@@ -946,7 +948,7 @@ UINT CChopStickDlg::Procedure()
 			//	break;
 		}
 	}
-	g.g_evtPrintMotor.SetEvent();
+//	g.g_evtPrintMotor.SetEvent();
 
 	m_ChopstickCounter++;
 	m_stopCounter++;
