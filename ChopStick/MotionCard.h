@@ -66,7 +66,12 @@
 //在印花机下面夹住筷子的气缸
 #define IN_HOLD_CHOPSTICK										9
 //感应到印花纸之后电机停下来
-#define IN_PRINTED_SENSOR										10
+#define  IN_PRINTED_SENSOR										10
+
+
+#define IN_HOLD_CYL
+
+#define IN_PRINTED_CYL				 
 
 
 //启动指示灯

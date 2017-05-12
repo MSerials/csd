@@ -686,19 +686,20 @@ UINT CChopStickDlg::PrintThread(LPVOID lParam)
 				{
 
 					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_拖住气缸, ON);
-					Sleep(180);
+				//	g.mc.wait_input_norm();12			13
 					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_滚花气缸, ON);
-					Sleep(1000);
+					Sleep(500);
 					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_拖住气缸, OFF);
 					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_滚花气缸, OFF);
-					Sleep(1100);
+					Sleep(500);
 					g.mc.PrintStepRun();
 				}
 			break;
 			default:break;
 			}
-		}
 			g.g_evtPrint.ResetEvent();
+		}
+			
 	}
 
 	return 0;
@@ -868,7 +869,8 @@ UINT CChopStickDlg::Procedure()
 	DWORD PrintTick = GetTickCount();
 	g.g_evtPrint.SetEvent();
 	StartRotation(); 
-	Sleep(200);
+	DWORD CameraTick = GetTickCount();
+	if ((CameraTick - PrintTick) < 170)				Sleep(170 - (CameraTick - PrintTick));
 	StartCamera();
 	RotationBack();
 	for (; g.g_evtImageProc.EventState();)
@@ -978,13 +980,13 @@ void CChopStickDlg::StartRotation()
 	{
 	case DOWN:	for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, ON); }
 				//if (!act->wait_input_inverse(IN_TRAP_IS_OPEN, 2000)) flag = SenorUp;/*等待感应器上限感应不到*/
-				Sleep(110);/* if (!wait_sensor_timeout(IN_TRAP_IS_CLOSE, 2000)) flag = SenorDown;*/  g.mc.Clock180(); 	m_down++;	m_total++; break;
+				Sleep(100);/* if (!wait_sensor_timeout(IN_TRAP_IS_CLOSE, 2000)) flag = SenorDown;*/  g.mc.Clock180(); 	m_down++;	m_total++; break;
 	case LEFT:	for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, ON); }
 				//if (!act->wait_input_inverse(IN_TRAP_IS_OPEN, 2000)) flag = SenorUp;/*等待感应器上限感应不到*/
-				Sleep(110);/* if (!wait_sensor_timeout(IN_TRAP_IS_CLOSE, 2000)) flag = SenorDown; */g.mc.CounterClock90();	m_left++;	m_total++; break;
+				Sleep(100);/* if (!wait_sensor_timeout(IN_TRAP_IS_CLOSE, 2000)) flag = SenorDown; */g.mc.CounterClock90();	m_left++;	m_total++; break;
 	case RIGHT:	for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, ON); }
 				//if (!act->wait_input_inverse(IN_TRAP_IS_OPEN, 2000)) flag = SenorUp;/*等待感应器上限感应不到*/
-				Sleep(110); /*if (!wait_sensor_timeout(IN_TRAP_IS_CLOSE, 2000)) flag = SenorDown; */g.mc.Clock90();			m_right++;	m_total++; break;
+				Sleep(100); /*if (!wait_sensor_timeout(IN_TRAP_IS_CLOSE, 2000)) flag = SenorDown; */g.mc.Clock90();			m_right++;	m_total++; break;
 	case UP:		m_up++;	m_total++; break;
 	case NOOBJECT:	m_none++; m_total++; break;
 	default:break;
@@ -1020,9 +1022,9 @@ UINT CChopStickDlg::RotationBack()
 	UINT flag = NoError;
 	switch (g.mc.actioninfo[g.mc.caculate_position(m_ChopstickCounter, g_RotationCylPos)].RoationInfo)
 	{
-	case DOWN:m_stopCounter = 0; if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = TIMEOUT; Sleep(50); for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); } /*if (!wait_sensor_timeout(IN_TRAP_IS_OPEN, 2000))flag = SenorUp; */Sleep(190);   g.mc.CounterClock180();	if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = MOTOR; Sleep(150); break;
-	case LEFT:m_stopCounter = 0; if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = TIMEOUT; Sleep(50); for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); } /* if (!wait_sensor_timeout(IN_TRAP_IS_OPEN, 2000))flag = SenorUp;*/ Sleep(190); g.mc.Clock90();				if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = MOTOR; Sleep(150);  break;
-	case RIGHT:m_stopCounter = 0; if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = TIMEOUT; Sleep(50); for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); } /*if (!wait_sensor_timeout(IN_TRAP_IS_OPEN, 2000))flag = SenorUp;*/ Sleep(190); g.mc.CounterClock90();	if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = MOTOR; Sleep(150);  break;
+	case DOWN:m_stopCounter = 0; if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = TIMEOUT; Sleep(50); for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); } /*if (!wait_sensor_timeout(IN_TRAP_IS_OPEN, 2000))flag = SenorUp; */Sleep(170);   g.mc.CounterClock180();	if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = MOTOR; Sleep(150); break;
+	case LEFT:m_stopCounter = 0; if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = TIMEOUT; Sleep(50); for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); } /* if (!wait_sensor_timeout(IN_TRAP_IS_OPEN, 2000))flag = SenorUp;*/ Sleep(170); g.mc.Clock90();				if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = MOTOR; Sleep(150);  break;
+	case RIGHT:m_stopCounter = 0; if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = TIMEOUT; Sleep(50); for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); } /*if (!wait_sensor_timeout(IN_TRAP_IS_OPEN, 2000))flag = SenorUp;*/ Sleep(170); g.mc.CounterClock90();	if (!g.mc.WaitMotorTimeout(FIRST_MOTOR, 2000)) flag = MOTOR; Sleep(150);  break;
 	case UP:m_stopCounter = 0;  for (int i = 0; i < MAX_COUNTER; i++) { g.mc.WriteOutPutBit(OUT_TRAP_CYL, OFF); }  break;
 	default:break;
 	}

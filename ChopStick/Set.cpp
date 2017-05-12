@@ -177,6 +177,9 @@ void Set::UpdateUI()
 		GetDlgItem(IDC_BUTTON_MOTOR3)->SetWindowText(L"滚花电机旋转");
 	else
 		GetDlgItem(IDC_BUTTON_MOTOR3)->SetWindowText(L"滚花电机停止");
+
+	str.Format(_T("%d"), g.ini.m_MotorSpinWavesPerTime1);
+	GetDlgItem(IDC_EDIT_STEP2)->SetWindowText(str);
 #endif
 }
 
@@ -263,6 +266,10 @@ void Set::OnBnClickedButtonSavepara()
 
 	GetDlgItem(IDC_EDIT_STEP)->GetWindowText(str);
 	g.ini.m_MotorSpinWavesPerTime = _ttoi(str);
+#ifdef PRINTED_VERSION2
+	GetDlgItem(IDC_EDIT_STEP2)->GetWindowText(str);
+	g.ini.m_MotorSpinWavesPerTime1 = _ttoi(str);
+#endif
 	//str.Format(_T("%d"), g.ini.m_MotorSpinSpeed);
 
 	GetDlgItem(IDC_EDIT_BYHAND)->GetWindowText(str);

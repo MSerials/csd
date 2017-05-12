@@ -566,6 +566,17 @@ int CMotionCard::ConveyorStepRun()
 
 #ifdef PRINTED_VERSION2
 
+	int tmp = g.ini.m_MotorSpinWavesPerTime1;//g.ini.m_MotorSpinWaves1
+	start_t_move(SECOND_MOTOR, tmp, g.ini.m_MotorSpinSpeed1 / 10, g.ini.m_MotorSpinSpeed1, 0.05);
+	DWORD TickCount = GetTickCount();
+	for (; !d1000_check_done(SECOND_MOTOR);)
+	{
+		Sleep(1);
+		if ((GetTickCount() - TickCount)>3000)
+		return TIMEOUT;
+	}
+	return 0;
+
 	if (!WaitMotorTimeout(FIRST_MOTOR, 10000)) return TIMEOUT;
 	d1000_start_tv_move(SECOND_MOTOR, g.ini.m_MotorSpinSpeed1 / 10, g.ini.m_MotorSpinSpeed1, 0.05);
 	DWORD StartTick = GetTickCount();
