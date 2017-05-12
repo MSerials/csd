@@ -81,6 +81,11 @@
 #define IDC_BUTTON_ROTATION_CYL         1041
 #define IDC_BUTTON_CYL4                 1042
 #define IDC_BUTTON_HOLD_CYL             1042
+#define IDC_EDIT_HODL_DELAY             1043
+#define IDC_EDIT_HODL_DELAY1            1044
+#define IDC_EDIT_CYL_PUSH_DELAY         1045
+#define IDC_EDIT_STOPTIME2              1047
+#define IDC_EDIT_CYL_PUSH_DELAY1        1047
 
 // Next default values for new objects
 // 

@@ -69,9 +69,9 @@
 #define  IN_PRINTED_SENSOR										10
 
 
-#define IN_HOLD_CYL
+#define IN_HOLD_CYL												12
 
-#define IN_PRINTED_CYL				 
+#define IN_PRINTED_CYL											13			 
 
 
 //Æô¶¯Ö¸Ê¾µÆ
@@ -150,11 +150,11 @@ public:
 	USHORT m_mcOutput[TOTAL_CARD_NUM];
 
 public:
-	virtual bool WaitMotorTimeout(short No, DWORD time);
+	virtual bool WaitMotorTimeout(short No, DWORD time = 1000);
 
-	virtual bool wait_input_norm(short Bits, DWORD Time);
+	virtual bool wait_input_norm(short Bits, DWORD Time = 1000);
 
-	virtual bool wait_input_inverse(short Bits, DWORD Time);
+	virtual bool wait_input_inverse(short Bits, DWORD Time = 1000);
 
 	int Clock180();
 

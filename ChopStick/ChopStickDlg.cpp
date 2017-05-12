@@ -158,6 +158,7 @@ BOOL CChopStickDlg::OnInitDialog()
 	InitUI();
 #ifdef PRINTED_VERSION2
 	startPrintThread();
+	startPrintMotorThread();
 #endif
 
 	startVideoCaputreThread();
@@ -684,15 +685,20 @@ UINT CChopStickDlg::PrintThread(LPVOID lParam)
 				case RIGHT:
 				case UP:
 				{
+					int m_Hold_Cyl_delay;
+					int m_Hold_Cyl_delay1;
+					int m_Push_Cyl_delay;
+					int m_Push_Cyl_delay1;
 
 					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_拖住气缸, ON);
-				//	g.mc.wait_input_norm();12			13
+					Sleep(g.ini.m_Hold_Cyl_delay);
 					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_滚花气缸, ON);
-					Sleep(500);
+					Sleep(g.ini.m_Push_Cyl_delay);
 					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_拖住气缸, OFF);
+					Sleep(g.ini.m_Hold_Cyl_delay1);
 					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_滚花气缸, OFF);
-					Sleep(500);
-					g.mc.PrintStepRun();
+					Sleep(g.ini.m_Push_Cyl_delay1);
+				//	g.mc.PrintStepRun();
 				}
 			break;
 			default:break;
@@ -705,6 +711,37 @@ UINT CChopStickDlg::PrintThread(LPVOID lParam)
 	return 0;
 }
 
+
+bool  CChopStickDlg::startPrintMotorThread()
+{
+	CWinThread* T = AfxBeginThread(PrintMotorThread, this, THREAD_PRIORITY_ABOVE_NORMAL, 0, 0, NULL);
+	if (!T) return false;
+	return true;
+}
+
+UINT CChopStickDlg::PrintMotorThread(LPVOID lParam)
+{
+	CChopStickDlg* pDlg = (CChopStickDlg*)lParam;
+	for (;;)
+	{
+		if (WAIT_OBJECT_0 == ::WaitForSingleObject(g.g_evtPrintMotor.evt, 1))
+		{
+			switch (g.mc.actioninfo[g.mc.caculate_position(pDlg->m_ChopstickCounter, g_PrintPos)].RoationInfo)
+			{
+			case DOWN:
+			case LEFT:
+			case RIGHT:
+			case UP:
+			{
+				g.mc.PrintStepRun();
+			}
+			break;
+			default:break;
+			}	
+			g.g_evtPrintMotor.ResetEvent();
+		}
+	}
+}
 
 //高级别
 bool CChopStickDlg::startImageDealThread()
@@ -867,6 +904,16 @@ UINT CChopStickDlg::Procedure()
 	UINT flag = CheckBeforeProcedure();				if (NoError != flag) return flag; 
 	flag = g.mc.ConveyorStepRun();					if (NoError != flag) return flag;
 	DWORD PrintTick = GetTickCount();
+	for (; g.g_evtPrintMotor.EventState();)
+	{
+		//	DWORD StartTick = GetTickCount();
+		if ((GetTickCount() - PrintTick) > 5000)
+		{
+			return PRINT_TIMEOUT;
+			//	break;
+		}
+	}
+
 	g.g_evtPrint.SetEvent();
 	StartRotation(); 
 	DWORD CameraTick = GetTickCount();
@@ -899,6 +946,7 @@ UINT CChopStickDlg::Procedure()
 			//	break;
 		}
 	}
+	g.g_evtPrintMotor.SetEvent();
 
 	m_ChopstickCounter++;
 	m_stopCounter++;

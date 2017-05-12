@@ -138,6 +138,7 @@ public:
 	};
 	_SysController Controller;
 	exEvent g_evtPrint;
+	exEvent g_evtPrintMotor;
 	exEvent	g_evtImageProc;
 	exEvent	g_evtActionProc;//
 	exEvent	g_evtGetVideoCapture;

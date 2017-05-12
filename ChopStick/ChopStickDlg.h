@@ -57,6 +57,9 @@ protected:
 	bool  startPrintThread();
 	static UINT PrintThread(LPVOID lParam);
 
+	bool  startPrintMotorThread();
+	static UINT PrintMotorThread(LPVOID lParam);
+
 
 	bool startImageDealThread();
 	bool isDeal;

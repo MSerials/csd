@@ -631,6 +631,11 @@ void CPreferences::LoadParaFile(UINT item)
 			m_mode1 = GetValueI(L"IOCARD_SETTING", L"mode1");
 			m_stoptime  = GetValueI(L"IOCARD_SETTING", L"STOPTIME");
 			m_DelayLaserTrigger = GetValueI(L"IOCARD_SETTING", L"LSRDELAY");
+
+			m_Hold_Cyl_delay = GetValueI(L"IOCARD_SETTING", L"HoldCyldelay");
+			m_Hold_Cyl_delay1 = GetValueI(L"IOCARD_SETTING", L"HoldCyldelay1");
+			m_Push_Cyl_delay = GetValueI(L"IOCARD_SETTING", L"PushCyldelay");
+			m_Push_Cyl_delay1 = GetValueI(L"IOCARD_SETTING", L"PushCyldelay1");
 		}
 	
 	}
@@ -725,6 +730,12 @@ void CPreferences::SaveParaFile(UINT item)
 		SetValueI(L"IOCARD_SETTING", L"mode1", m_mode1);
 		SetValueI(L"IOCARD_SETTING", L"STOPTIME", m_stoptime);
 		SetValueI(L"IOCARD_SETTING", L"LSRDELAY", m_DelayLaserTrigger);
+
+		SetValueI(L"IOCARD_SETTING", L"HoldCyldelay", m_Hold_Cyl_delay);
+		SetValueI(L"IOCARD_SETTING", L"HoldCyldelay1", m_Hold_Cyl_delay1);
+		SetValueI(L"IOCARD_SETTING", L"PushCyldelay", m_Push_Cyl_delay);
+		SetValueI(L"IOCARD_SETTING", L"PushCyldelay1", m_Push_Cyl_delay1);
+
 	}
 	
 	//if(PARA_SN==(mask&PARA_SN))
@@ -814,6 +825,12 @@ void CPreferences::initData()
 	m_MotorSpinWavesPerTime1 = 1600;
 	m_MotorCompenstate1 = 1600;
 	m_mode1 = 0;
+
+	m_Hold_Cyl_delay= 300;
+	m_Hold_Cyl_delay1 = 300;
+	m_Push_Cyl_delay = 300;
+	m_Push_Cyl_delay1 = 300;
+
 	m_stoptime = 0;
 	m_DelayLaserTrigger = 250;
 }

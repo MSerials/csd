@@ -180,6 +180,27 @@ void Set::UpdateUI()
 
 	str.Format(_T("%d"), g.ini.m_MotorSpinWavesPerTime1);
 	GetDlgItem(IDC_EDIT_STEP2)->SetWindowText(str);
+
+	str.Format(_T("%d"), g.ini.m_Hold_Cyl_delay);
+	GetDlgItem(IDC_EDIT_HODL_DELAY)->SetWindowText(str);
+
+	str.Format(_T("%d"), g.ini.m_Hold_Cyl_delay1);
+	GetDlgItem(IDC_EDIT_HODL_DELAY1)->SetWindowText(str);
+
+
+	str.Format(_T("%d"), g.ini.m_Push_Cyl_delay);
+	GetDlgItem(IDC_EDIT_CYL_PUSH_DELAY)->SetWindowText(str);
+
+
+	str.Format(_T("%d"), g.ini.m_Push_Cyl_delay1);
+	GetDlgItem(IDC_EDIT_CYL_PUSH_DELAY1)->SetWindowText(str);
+
+	
+#else
+	GetDlgItem(IDC_EDIT_HODL_DELAY)->ShowWindow(FALSE);
+	GetDlgItem(IDC_EDIT_HODL_DELAY1)->ShowWindow(FALSE);
+	GetDlgItem(IDC_EDIT_CYL_PUSH_DELAY)->ShowWindow(FALSE);
+	GetDlgItem(IDC_EDIT_CYL_PUSH_DELAY1)->ShowWindow(FALSE);
 #endif
 }
 
@@ -269,6 +290,18 @@ void Set::OnBnClickedButtonSavepara()
 #ifdef PRINTED_VERSION2
 	GetDlgItem(IDC_EDIT_STEP2)->GetWindowText(str);
 	g.ini.m_MotorSpinWavesPerTime1 = _ttoi(str);
+
+	GetDlgItem(IDC_EDIT_HODL_DELAY)->GetWindowText(str);
+	g.ini.m_Hold_Cyl_delay = _ttoi(str);
+
+	GetDlgItem(IDC_EDIT_HODL_DELAY1)->GetWindowText(str);
+	g.ini.m_Hold_Cyl_delay1 = _ttoi(str);
+
+	GetDlgItem(IDC_EDIT_CYL_PUSH_DELAY)->GetWindowText(str);
+	g.ini.m_Push_Cyl_delay = _ttoi(str);
+
+	GetDlgItem(IDC_EDIT_CYL_PUSH_DELAY1)->GetWindowText(str);
+	g.ini.m_Push_Cyl_delay1 = _ttoi(str);
 #endif
 	//str.Format(_T("%d"), g.ini.m_MotorSpinSpeed);
 

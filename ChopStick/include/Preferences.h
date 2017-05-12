@@ -202,6 +202,12 @@ public:
 	int m_MotorSpinWavesPerTime1;
 	int m_MotorCompenstate1;
 	int m_mode1;
+
+
+	int m_Hold_Cyl_delay;
+	int m_Hold_Cyl_delay1;
+	int m_Push_Cyl_delay;
+	int m_Push_Cyl_delay1;
 	//ºıÀŸ ±º‰
 	int m_stoptime;
 	int m_DelayLaserTrigger;
