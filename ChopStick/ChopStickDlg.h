@@ -46,6 +46,9 @@ protected:
 	void ErrorTip(int ErrorCode);
 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+	void system_pause();
+	void system_start();
 	
 	void ShowDealedImg(const cv::Mat& mat);
 

@@ -43,5 +43,6 @@ public:
 	afx_msg void OnBnClickedButtonMotor3();
 	afx_msg void OnBnClickedButtonRotationCyl();
 	afx_msg void OnBnClickedButtonHoldCyl();
+	afx_msg void OnBnClickedButtonMotor4();
 };
 extern Set *SetDlg;

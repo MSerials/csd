@@ -158,7 +158,7 @@ BOOL CChopStickDlg::OnInitDialog()
 	InitUI();
 #ifdef PRINTED_VERSION2
 	startPrintThread();
-//	startPrintMotorThread();
+	startPrintMotorThread();
 #endif
 
 	startVideoCaputreThread();
@@ -175,6 +175,7 @@ BOOL CChopStickDlg::OnInitDialog()
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
+
 
 void CChopStickDlg::Veritfy()
 {
@@ -493,6 +494,21 @@ void CChopStickDlg::ErrorTip(int ErrorCode)
 	AfxMessageBox(str);
 }
 
+
+void CChopStickDlg::system_pause()
+{
+	g.mc.WriteOutPutBit(OUT_ALM, OFF);
+	g.Controller.MotorState = STOP;
+	write_output(OUT_START_INDICATOR, OFF);
+	write_output(OUT_PAUSE_INDICATOR, ON);
+	g.g_evtActionProc.ResetEvent();
+}
+void CChopStickDlg::system_start()
+{
+
+}
+
+
 void CChopStickDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
@@ -574,11 +590,7 @@ void CChopStickDlg::OnTimer(UINT_PTR nIDEvent)
 		else if (!startState && pauseState)
 		{
 			counter = 0;
-			g.mc.WriteOutPutBit(OUT_ALM, OFF);
-			g.Controller.MotorState = STOP;
-			write_output(OUT_START_INDICATOR, OFF);
-			write_output(OUT_PAUSE_INDICATOR, ON);
-			g.g_evtActionProc.ResetEvent();
+			system_pause();
 		}
 		else
 		{
@@ -676,6 +688,7 @@ UINT CChopStickDlg::PrintThread(LPVOID lParam)
 	CChopStickDlg* pDlg = (CChopStickDlg*)lParam;
 	for (;;)
 	{
+		Sleep(5);
 		if (WAIT_OBJECT_0 == ::WaitForSingleObject(g.g_evtPrint.evt, 1))
 		{
 			switch (g.mc.actioninfo[g.mc.caculate_position(pDlg->m_ChopstickCounter, g_PrintPos)].RoationInfo)
@@ -689,16 +702,15 @@ UINT CChopStickDlg::PrintThread(LPVOID lParam)
 					int m_Hold_Cyl_delay1;
 					int m_Push_Cyl_delay;
 					int m_Push_Cyl_delay1;
-
+					
 					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_拖住气缸, ON);
 					Sleep(g.ini.m_Hold_Cyl_delay);
 					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_滚花气缸, ON);
 					Sleep(g.ini.m_Push_Cyl_delay);
 					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_拖住气缸, OFF);
 					Sleep(g.ini.m_Hold_Cyl_delay1);
-					for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_滚花气缸, OFF);
-					Sleep(g.ini.m_Push_Cyl_delay1);
-					g.mc.PrintStepRun();
+					
+				//	g.mc.PrintStepRun();
 				}
 			break;
 			default:break;
@@ -714,7 +726,7 @@ UINT CChopStickDlg::PrintThread(LPVOID lParam)
 
 bool  CChopStickDlg::startPrintMotorThread()
 {
-	CWinThread* T = AfxBeginThread(PrintMotorThread, this, THREAD_PRIORITY_ABOVE_NORMAL, 0, 0, NULL);
+	CWinThread* T = AfxBeginThread(PrintMotorThread, this, THREAD_PRIORITY_HIGHEST, 0, 0, NULL);
 	if (!T) return false;
 	return true;
 }
@@ -724,8 +736,12 @@ UINT CChopStickDlg::PrintMotorThread(LPVOID lParam)
 	CChopStickDlg* pDlg = (CChopStickDlg*)lParam;
 	for (;;)
 	{
+		Sleep(1);
 		if (WAIT_OBJECT_0 == ::WaitForSingleObject(g.g_evtPrintMotor.evt, 1))
 		{
+			
+			for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_滚花气缸, OFF);
+			Sleep(g.ini.m_Push_Cyl_delay1);
 			switch (g.mc.actioninfo[g.mc.caculate_position(pDlg->m_ChopstickCounter, g_PrintPos)].RoationInfo)
 			{
 			case DOWN:
@@ -733,7 +749,12 @@ UINT CChopStickDlg::PrintMotorThread(LPVOID lParam)
 			case RIGHT:
 			case UP:
 			{
-				g.mc.PrintStepRun();
+				if (0 != g.mc.PrintStepRun())
+				{
+					pDlg->system_pause();
+					//Sleep(200);
+					AfxMessageBox(L"印花机电机超时，检查下印花机电机的印花纸是否卡住");
+				}
 			}
 			break;
 			default:break;
@@ -757,6 +778,7 @@ UINT CChopStickDlg::ImageDealThread(LPVOID lParam)
 	pDlg->isDeal = true;
 	for(;;)
 	{
+		Sleep(2);
 		if (WAIT_OBJECT_0 == ::WaitForSingleObject(g.g_evtImageProc.evt,1))
 		{
 			//cv::Mat res;
@@ -785,7 +807,6 @@ UINT CChopStickDlg::ProcThread(LPVOID lParam)
 {
 	CChopStickDlg* pDlg = (CChopStickDlg*)lParam;
 	pDlg->isProcedure = true;
-
 	for (;;)
 	{
 		if (WAIT_OBJECT_0 == WaitForSingleObject(g.g_evtActionProc.evt, 1))
@@ -904,17 +925,17 @@ UINT CChopStickDlg::Procedure()
 	UINT flag = CheckBeforeProcedure();				if (NoError != flag) return flag; 
 	flag = g.mc.ConveyorStepRun();					if (NoError != flag) return flag;
 	DWORD PrintTick = GetTickCount();
-	/*
+	
 	for (; g.g_evtPrintMotor.EventState();)
 	{
-		//	DWORD StartTick = GetTickCount();
+		Sleep(1);
 		if ((GetTickCount() - PrintTick) > 5000)
 		{
 			return PRINT_TIMEOUT;
 			//	break;
 		}
 	}
-	*/
+	
 
 	g.g_evtPrint.SetEvent();
 	StartRotation(); 
@@ -932,11 +953,6 @@ UINT CChopStickDlg::Procedure()
 		}
 	}
 	g.mc.actioninfo[g.mc.caculate_position(m_ChopstickCounter, g_CameraPos)].RoationInfo = m_ImageResult;
-	DWORD EndTickTime = GetTickCount();
-	if ((EndTickTime - PrintTick) < g.ini.m_markdelay)
-	{
-		Sleep(g.ini.m_markdelay - (EndTickTime - PrintTick));
-	}
 
 	//检查是否到位
 	for (; g.g_evtPrint.EventState();)
@@ -948,7 +964,13 @@ UINT CChopStickDlg::Procedure()
 			//	break;
 		}
 	}
-//	g.g_evtPrintMotor.SetEvent();
+	g.g_evtPrintMotor.SetEvent();
+
+	DWORD EndTickTime = GetTickCount();
+	if ((EndTickTime - PrintTick) < g.ini.m_markdelay)
+	{
+		Sleep(g.ini.m_markdelay - (EndTickTime - PrintTick));
+	}
 
 	m_ChopstickCounter++;
 	m_stopCounter++;

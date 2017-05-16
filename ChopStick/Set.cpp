@@ -47,6 +47,7 @@ BEGIN_MESSAGE_MAP(Set, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_MOTOR3, &Set::OnBnClickedButtonMotor3)
 	ON_BN_CLICKED(IDC_BUTTON_ROTATION_CYL, &Set::OnBnClickedButtonRotationCyl)
 	ON_BN_CLICKED(IDC_BUTTON_HOLD_CYL, &Set::OnBnClickedButtonHoldCyl)
+	ON_BN_CLICKED(IDC_BUTTON_MOTOR4, &Set::OnBnClickedButtonMotor4)
 END_MESSAGE_MAP()
 
 
@@ -511,4 +512,11 @@ void Set::OnBnClickedButtonHoldCyl()
 		for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_拖住气缸, ON);
 		GetDlgItem(IDC_BUTTON_HOLD_CYL)->SetWindowText(L"托筷子气缸下降");
 	}
+}
+
+
+void Set::OnBnClickedButtonMotor4()
+{
+	// TODO:  在此添加控件通知处理程序代码
+	g.g_evtPrintMotor.SetEvent();
 }

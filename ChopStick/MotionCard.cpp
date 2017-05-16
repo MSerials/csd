@@ -282,15 +282,20 @@ bool CMotionCard::wait_input_inverse(short Bits, DWORD Time)
 int CMotionCard::PrintStepRun()
 {
 	DWORD StartTick = GetTickCount();
+	//DWORD NewOldPrintSensorState = !d1000_in_bit(IN_PRINTED_SENSOR);
+	//static DWORD OldPrintSensorState = NewOldPrintSensorState;
 	for (int i = 0; i < MAX_COUNTER; i++) WriteOutPutBit(OUT_印花机电机, ON);
+
+
 	for (; !d1000_in_bit(IN_PRINTED_SENSOR);) //第二个感应器
 	{
+		//Sleep(1);
 		if (::WaitForSingleObject(g.g_evtEStop.evt, 0) == WAIT_OBJECT_0)
 		{
 			for (int i = 0; i < MAX_COUNTER; i++) WriteOutPutBit(OUT_印花机电机, OFF);
 			return EMERGNCY;
 		}
-		if ((GetTickCount() - StartTick) > 2000)
+		if ((GetTickCount() - StartTick) > 1000)
 		{
 			for (int i = 0; i < MAX_COUNTER; i++) WriteOutPutBit(OUT_印花机电机, OFF);
 			return TIMEOUT;
@@ -298,12 +303,13 @@ int CMotionCard::PrintStepRun()
 	}
 	for (; d1000_in_bit(IN_PRINTED_SENSOR);) //第二个感应器
 	{
+		//Sleep(1);
 		if (::WaitForSingleObject(g.g_evtEStop.evt, 0) == WAIT_OBJECT_0)
 		{
 			for (int i = 0; i < MAX_COUNTER; i++) WriteOutPutBit(OUT_印花机电机, OFF);
 			return EMERGNCY;
 		}
-		if ((GetTickCount() - StartTick) > 5000)
+		if ((GetTickCount() - StartTick) > 1500)
 		{
 			for (int i = 0; i < MAX_COUNTER; i++) WriteOutPutBit(OUT_印花机电机, OFF);
 			return TIMEOUT;

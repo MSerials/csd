@@ -826,10 +826,10 @@ void CPreferences::initData()
 	m_MotorCompenstate1 = 1600;
 	m_mode1 = 0;
 
-	m_Hold_Cyl_delay= 300;
-	m_Hold_Cyl_delay1 = 300;
-	m_Push_Cyl_delay = 300;
-	m_Push_Cyl_delay1 = 300;
+	m_Hold_Cyl_delay= 135;
+	m_Hold_Cyl_delay1 = 1;
+	m_Push_Cyl_delay = 345;
+	m_Push_Cyl_delay1 = 1;
 
 	m_stoptime = 0;
 	m_DelayLaserTrigger = 250;
