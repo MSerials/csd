@@ -53,11 +53,11 @@
 
 //#define _TEST
 //激光打标的
-//#define LASER_VERSION
+#define LASER_VERSION
 //电机带动的印花机
 //#define PRINTED_VERSION
 //气缸带动的印花机
-#define PRINTED_VERSION2
+//#define PRINTED_VERSION2
 
 #define MAX_COUNTER 1024
 

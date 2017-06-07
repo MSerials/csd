@@ -91,6 +91,11 @@ BOOL Set::OnInitDialog()
 	GetDlgItem(IDC_BUTTON_HOLD_CYL)->SetWindowText(L"托筷子气缸上升");
 	GetDlgItem(IDC_BUTTON_MOTOR3)->SetWindowText(L"滚花电机旋转");
 #else
+	GetDlgItem(IDC_STATIC_1)->ShowWindow(FALSE);
+	GetDlgItem(IDC_STATIC_2)->ShowWindow(FALSE);
+	GetDlgItem(IDC_STATIC_3)->ShowWindow(FALSE);
+	GetDlgItem(IDC_STATIC_4)->ShowWindow(FALSE);
+	GetDlgItem(IDC_BUTTON_MOTOR4)->ShowWindow(FALSE);
 	GetDlgItem(IDC_BUTTON_ROTATION_CYL)->ShowWindow(FALSE);
 	GetDlgItem(IDC_BUTTON_HOLD_CYL)->ShowWindow(FALSE);
 	GetDlgItem(IDC_BUTTON_MOTOR3)->ShowWindow(FALSE);
@@ -161,6 +166,7 @@ void Set::UpdateUI()
 
 	str.Format(_T("%d"), g.ini.m_DelayLaserTrigger);
 	GetDlgItem(IDC_EDIT_DELAYLASER)->SetWindowText(str);
+
 
 #ifdef PRINTED_VERSION2
 	if(!g.mc.ReadOutputBit(OUT_滚花气缸))

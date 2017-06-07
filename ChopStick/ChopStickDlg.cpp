@@ -686,6 +686,7 @@ bool  CChopStickDlg::startPrintThread()
 UINT CChopStickDlg::PrintThread(LPVOID lParam)
 {
 	CChopStickDlg* pDlg = (CChopStickDlg*)lParam;
+#ifdef PRINT_VERSION2
 	for (;;)
 	{
 		Sleep(5);
@@ -719,7 +720,7 @@ UINT CChopStickDlg::PrintThread(LPVOID lParam)
 		}
 			
 	}
-
+#endif
 	return 0;
 }
 
@@ -734,6 +735,7 @@ bool  CChopStickDlg::startPrintMotorThread()
 UINT CChopStickDlg::PrintMotorThread(LPVOID lParam)
 {
 	CChopStickDlg* pDlg = (CChopStickDlg*)lParam;
+#ifdef PRINT_VERSION2
 	for (;;)
 	{
 		Sleep(1);
@@ -762,6 +764,8 @@ UINT CChopStickDlg::PrintMotorThread(LPVOID lParam)
 			g.g_evtPrintMotor.ResetEvent();
 		}
 	}
+#endif 
+	return 0;
 }
 
 //¸ß¼¶±ð
@@ -988,7 +992,7 @@ UINT CChopStickDlg::Procedure()
 #endif
 
 
-#ifdef LAYSER_VERSION
+#ifdef LASER_VERSION
 
 UINT CChopStickDlg::Procedure()
 {
