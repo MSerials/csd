@@ -56,7 +56,7 @@ int COpencvprocess::MatImgProcess(const cv::Mat& mat, cv::Mat& dst)
 
 			cv::findContours(grayforcont, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_NONE, cvPoint(0, 0));
 
-			int MaxID = getMaxIDandDeleteMin(contours, 1100);
+			int MaxID = getMaxIDandDeleteMin(contours, 1000);
 			//if (0 != contours.size()) cout << contours[0].size() << endl;
 			//用于找到白色最大连通区域
 			if (-1 == MaxID)
