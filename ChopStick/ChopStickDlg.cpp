@@ -1076,7 +1076,7 @@ void CChopStickDlg::StartLaser()
 
 #endif
 
-#ifdef LAYSER_VERSION
+#ifdef LASER_VERSION
 	switch (g.mc.actioninfo[g.mc.caculate_position(m_ChopstickCounter, g_LaserPos)].RoationInfo)
 	{
 	case UP:
