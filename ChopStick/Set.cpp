@@ -524,5 +524,6 @@ void Set::OnBnClickedButtonHoldCyl()
 void Set::OnBnClickedButtonMotor4()
 {
 	// TODO:  在此添加控件通知处理程序代码
-	g.g_evtPrintMotor.SetEvent();
+	g.mc.PrintStepRun();
+	//g.g_evtPrintMotor.SetEvent();
 }
