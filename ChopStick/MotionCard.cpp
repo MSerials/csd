@@ -227,7 +227,7 @@ void CMotionCard::EStopMove(short axis)
 
 BOOL CMotionCard::WriteOutPutBit(short BitNo,short BitData)
 {
-  d1000_out_bit(BitNo,BitData);
+  d1000_out_bit(BitNo, BitData);
   return TRUE;
 }
 
@@ -526,7 +526,7 @@ int CMotionCard::ConveyorStepRun()
 #endif
 #ifdef LASER_VERSION
 
-	if(!WaitMotorTimeout(FIRST_MOTOR, 10000)) return TIMEOUT;
+	if(!WaitMotorTimeout(SECOND_MOTOR, 10000)) return TIMEOUT;
 	d1000_start_tv_move(SECOND_MOTOR, g.ini.m_MotorSpinSpeed1 / 10, g.ini.m_MotorSpinSpeed1, 0.05);
 	DWORD StartTick = GetTickCount();
 	for (; !d1000_in_bit(SECOND_ORIGIN_SENSOR);) //第二个感应器
@@ -536,7 +536,7 @@ int CMotionCard::ConveyorStepRun()
 			d1000_immediate_stop(SECOND_MOTOR);
 			return EMERGNCY;
 		}
-		if ((GetTickCount() - StartTick) > 500)
+		if ((GetTickCount() - StartTick) > 1000)
 		{
 			d1000_immediate_stop(SECOND_MOTOR);
 			return TIMEOUT;
@@ -549,7 +549,7 @@ int CMotionCard::ConveyorStepRun()
 			d1000_immediate_stop(SECOND_MOTOR);
 			return EMERGNCY;
 		}
-		if ((GetTickCount() - StartTick) > 1000)
+		if ((GetTickCount() - StartTick) > 3000)
 		{
 			d1000_immediate_stop(SECOND_MOTOR);
 			return TIMEOUT;

@@ -530,8 +530,8 @@ void CChopStickDlg::OnTimer(UINT_PTR nIDEvent)
 			g.g_evtEStop.SetEvent();
 			g.mc.Stop(FIRST_MOTOR);
 			g.mc.Stop(SECOND_MOTOR);
-			g.mc.WriteOutPutBit(OUT_ALM, ON);
-			g.mc.WriteOutPutBit(OUT_SERVO_MOTOR, OFF);
+			for (int i = 0; i < MAX_COUNTER; i++)  g.mc.WriteOutPutBit(OUT_ALM, ON);
+			for (int i = 0; i < MAX_COUNTER; i++)  g.mc.WriteOutPutBit(OUT_SERVO_MOTOR, OFF);
 			g.Controller.SysState |= EMERGENCY;
 			str += L"急停按钮按下 ";
 		}
@@ -545,15 +545,15 @@ void CChopStickDlg::OnTimer(UINT_PTR nIDEvent)
 
 		if (oldalamState != alamState && !alamState)
 		{
-			g.mc.WriteOutPutBit(OUT_ALM, OFF);
-			g.Controller.SysState &= ~MTR2ALM;
+			for (int i = 0; i < MAX_COUNTER; i++)  g.mc.WriteOutPutBit(OUT_ALM, OFF);
+			for (int i = 0; i < MAX_COUNTER; i++)  g.Controller.SysState &= ~MTR2ALM;
 		}
 
 
 		if (alamState)
 		{
 			g.g_evtEStop.SetEvent();
-			g.mc.WriteOutPutBit(OUT_ALM, ON);
+			for (int i = 0; i < MAX_COUNTER; i++)  g.mc.WriteOutPutBit(OUT_ALM, ON);
 			g.Controller.SysState |= MTR2ALM;
 			str += L"伺服电机报警 ";
 
@@ -563,7 +563,7 @@ void CChopStickDlg::OnTimer(UINT_PTR nIDEvent)
 		if (startState && pauseState)
 		{
 			counter++;
-			g.mc.WriteOutPutBit(OUT_ALM, OFF);
+			for (int i = 0; i < MAX_COUNTER; i++)  g.mc.WriteOutPutBit(OUT_ALM, OFF);
 			if (counter > 10)
 			{
 				g.g_evtEStop.ResetEvent();
@@ -574,15 +574,15 @@ void CChopStickDlg::OnTimer(UINT_PTR nIDEvent)
 		else if (startState && !pauseState)
 		{
 			m_stopCounter = 0;
-			g.mc.WriteOutPutBit(OUT_ALM, OFF);
+			for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_ALM, OFF);
 			counter = 0;
 			if (STOP == (STOP & g.Controller.MotorState) && !g.Controller.SysState)
 			{
 				//yunxing
 				CapState = STOP;
 				g.Controller.MotorState = START;
-				write_output(OUT_START_INDICATOR, ON);
-				write_output(OUT_PAUSE_INDICATOR, OFF);
+				for (int i = 0; i < MAX_COUNTER; i++)  write_output(OUT_START_INDICATOR, ON);
+				for (int i = 0; i < MAX_COUNTER; i++)  write_output(OUT_PAUSE_INDICATOR, OFF);
 				g.mc.WriteOutPutBit(OUT_ALM, OFF); //
 				g.g_evtActionProc.SetEvent();
 			}
@@ -606,7 +606,7 @@ void CChopStickDlg::OnTimer(UINT_PTR nIDEvent)
 		}
 		else if (emState != embutton && !emState)
 		{
-			g.mc.WriteOutPutBit(OUT_ALM, OFF);
+			for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_ALM, OFF);
 		}
 		embutton = emState;
 
@@ -830,7 +830,7 @@ UINT CChopStickDlg::ProcThread(LPVOID lParam)
 #ifdef LASER_VERSION
 					//		pMainDlg->showError(L"上限感应器不亮，没通气或者感应器松动"); break;
 #endif
-				case TIMEOUT:			pDlg->ErrorShow(L"电机超时");								break;
+				case TIMEOUT:			pDlg->ErrorShow(L"电机超时"); for (int i = 0; i < MAX_COUNTER; i++) g.mc.WriteOutPutBit(OUT_ALM, ON);	break;
 				case TIMEOUTIMG:		pDlg->ErrorShow(L"图像处理超时");							break;
 				case SEVRO:				pDlg->ErrorShow(L"伺服速度太慢或报警");						break;
 				case MOTOR:				pDlg->ErrorShow(L"感应器无法感应到位置或者电机不在原点");	break;
