@@ -64,6 +64,22 @@ CChopStickDlg::CChopStickDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_CHOPSTICK_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+
+
+
+	HANDLE hObject = ::CreateMutex(NULL, FALSE, _T("ChopStick1.9.12"));
+	if (GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		CloseHandle(hObject);
+		AfxMessageBox(L"程序已经运行，请勿多开。如果前一个看不见，请打开任务管理器，将进程掐掉");
+		exit(0);
+	}
+
+
+
+
+
 	 m_total = 0;
 	 m_up = 0;
 	 m_left = 0;
@@ -332,18 +348,6 @@ void CChopStickDlg::InitUI()
 	}
 
 	if (g.isActivated) { GetDlgItem(IDC_BUTTON_ACTIVE)->ShowWindow(FALSE); return; }
-/*
-	CFont font;
-	font.CreateFont(10, 10, 0, 0, FW_BLACK, FALSE, FALSE,
-		FALSE, GB2312_CHARSET, OUT_DEFAULT_PRECIS,
-		CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-		FIXED_PITCH | FF_MODERN, _T("仿宋"));
-		*/
-		//	GetDlgItem(IDC_STATIC_TOTAL)->SetFont(&font);
-		//	GetDlgItem(IDC_STATIC_TOTAL)->
-
-//	font.DeleteObject();
-
 }
 
 void CChopStickDlg::OnBnClickedButtonReset()
@@ -556,7 +560,6 @@ void CChopStickDlg::OnTimer(UINT_PTR nIDEvent)
 			for (int i = 0; i < MAX_COUNTER; i++)  g.mc.WriteOutPutBit(OUT_ALM, ON);
 			g.Controller.SysState |= MTR2ALM;
 			str += L"伺服电机报警 ";
-
 		}
 
 
