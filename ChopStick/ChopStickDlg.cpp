@@ -169,7 +169,7 @@ BOOL CChopStickDlg::OnInitDialog()
 	dahengcam = new CDahengCam();
 	if (NULL != dahengcam->m_hDevice) GXSetFloat(dahengcam->m_hDevice, GX_FLOAT_EXPOSURE_TIME, g.ini.m_shutter);
 
-	Veritfy();
+	//Veritfy();
 
 	InitUI();
 #ifdef PRINTED_VERSION2

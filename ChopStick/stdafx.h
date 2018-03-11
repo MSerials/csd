@@ -126,6 +126,9 @@ public:
 
 	COpencvprocess opencv;
 	CPreferences ini;
+	
+	CPreferences rec;
+	CPreferences rec_bak;
 	CMotionCard mc;
 
 
