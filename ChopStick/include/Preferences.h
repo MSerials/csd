@@ -169,6 +169,8 @@ public:
 
 
 	//#define PARA_PRJ            (0x1<<0)
+
+
 	int m_idCamera;
 	int m_nTriggerOutForBack, m_nTriggerOutForFront, m_nTriggerOutForFinish;
 	int m_nSetTimerIntervals;
@@ -211,6 +213,17 @@ public:
 	//减速时间
 	int m_stoptime;
 	int m_DelayLaserTrigger;
+
+
+	//SN
+	int m_record_total = 0;
+	int m_record_up = 0;
+	int m_record_down = 0;
+	int m_record_left = 0;
+	int m_record_right = 0;
+	int m_record_void = 0;
+	//如果发现文件不可读取，从备份中找回来
+	int m_can_be_read = 1;
 };
 //extern CPreferences *ini;
 #endif // !defined(AFX_PREFERENCES_H__4133CB8C_D2DA_4B24_9A3E_66C33ABA291E__INCLUDED_)

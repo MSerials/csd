@@ -75,11 +75,6 @@ CChopStickDlg::CChopStickDlg(CWnd* pParent /*=NULL*/)
 		AfxMessageBox(L"程序已经运行，请勿多开。如果前一个看不见，请打开任务管理器，将进程掐掉");
 		exit(0);
 	}
-
-
-
-
-
 	 m_total = 0;
 	 m_up = 0;
 	 m_left = 0;
@@ -97,9 +92,46 @@ CChopStickDlg::CChopStickDlg(CWnd* pParent /*=NULL*/)
 	 g.ini.SetIniDir(AppPath, false);
 	 if (0 == g.ini.SetIniFile(L"PrgParameter.ini"))
 	 {
-		 g.ini.SaveParaFile(PARA_ALL);
+		 g.ini.SaveParaFile(PARA_PRJ | PARA_IMAGE | PARA_IO);
 	 }
-	 g.ini.LoadParaFile(PARA_ALL);
+	 g.ini.LoadParaFile(PARA_PRJ | PARA_IMAGE | PARA_IO);
+
+#ifdef NEED
+	 g.rec.SetIniDir(AppPath, false);
+	 if (0 == g.rec.SetIniFile(L"rec.ini"))
+	 {
+		 g.rec.SaveParaFile(PARA_SN);
+	 }
+	 g.rec.LoadParaFile(PARA_SN);
+
+	 g.rec_bak.SetIniDir(AppPath, false);
+	 if (0 == g.rec_bak.SetIniFile(L"rec_bak.ini"))
+	 {
+		 g.rec_bak.SaveParaFile(PARA_SN);
+	 }
+	 g.rec_bak.LoadParaFile(PARA_SN);
+
+	 //读取出现错误,从备份里调出
+	 if (1 != g.rec.m_can_be_read)
+	 {
+		 g.rec.m_can_be_read = 1;
+		 g.rec.m_record_total = g.rec_bak.m_record_total;
+		 g.rec.m_record_up = g.rec_bak.m_record_up;
+		 g.rec.m_record_down = g.rec_bak.m_record_down;
+		 g.rec.m_record_left = g.rec_bak.m_record_left;
+		 g.rec.m_record_right = g.rec_bak.m_record_right;
+		 g.rec.m_record_void = g.rec_bak.m_record_void;
+		 g.rec.SaveParaFile(PARA_SN);
+	 }
+
+	 m_total = g.rec.m_record_total;
+	 m_up = g.rec.m_record_up;
+	 m_down = g.rec.m_record_down;
+	 m_left = g.rec.m_record_left;
+	 m_right = g.rec.m_record_right;
+	 m_none = g.rec.m_record_void;
+#endif
+
 }
 
 void CChopStickDlg::DoDataExchange(CDataExchange* pDX)
@@ -191,7 +223,6 @@ BOOL CChopStickDlg::OnInitDialog()
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
-
 
 void CChopStickDlg::Veritfy()
 {
@@ -328,7 +359,7 @@ void CChopStickDlg::InitUI()
 	UpdateUI();
 	SetWindowText(_T("浙江爱易特智能技术有限公司-筷子青面检测机-2017.3.27"));
 	CString str;
-	str.Format(_T("激光延时: %d ms"), g.ini.m_markdelay);
+	str.Format(_T("%d"), g.ini.m_markdelay);
 	GetDlgItem(IDC_EDIT_DELAY)->SetWindowText(str);
 
 	//m_markdelay = ini->m_markdelay;
@@ -344,7 +375,7 @@ void CChopStickDlg::InitUI()
 	case DOWN:pbox->SetCurSel(1); break;
 	case LEFT:pbox->SetCurSel(2); break;
 	case RIGHT:pbox->SetCurSel(3); break;
-	default:g.ini.m_direction = UP; pbox->SetCurSel(0); g.ini.SaveParaFile(PARA_ALL); break;
+	default:g.ini.m_direction = UP; pbox->SetCurSel(0); g.ini.SaveParaFile(PARA_PRJ|PARA_IMAGE | PARA_IO); break;
 	}
 
 	if (g.isActivated) { GetDlgItem(IDC_BUTTON_ACTIVE)->ShowWindow(FALSE); return; }
@@ -377,12 +408,13 @@ void CChopStickDlg::OnBnClickedButtoncCap()
 void CChopStickDlg::OnBnClickedButtonClear()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	m_total = 0;
-	m_up = 0;
-	m_left = 0;
-	m_right = 0;
-	m_down = 0;
-	m_none = 0;
+	m_total = g.rec.m_record_total = g.rec_bak.m_record_total = 0;
+	m_up = g.rec.m_record_up = g.rec_bak.m_record_up = 0;
+	m_down = g.rec.m_record_down = g.rec_bak.m_record_down = 0;
+	m_left = g.rec.m_record_left = g.rec_bak.m_record_left = 0;
+	m_right = g.rec.m_record_right = g.rec_bak.m_record_right = 0;
+	m_none = g.rec.m_record_void = g.rec_bak.m_record_void = 0;
+
 	InitUI();
 }
 
@@ -396,9 +428,9 @@ void CChopStickDlg::OnBnClickedButtonSaveDelay()
 	{
 		g.ini.m_markdelay = 20;
 	}
-	str.Format(_T("激光延时: %d ms"), g.ini.m_markdelay);
+	str.Format(_T("%d"), g.ini.m_markdelay);
 	GetDlgItem(IDC_EDIT_DELAY)->SetWindowText(str);
-	g.ini.SaveParaFile(PARA_ALL);
+	g.ini.SaveParaFile(PARA_PRJ | PARA_IMAGE | PARA_IO);
 }
 
 
@@ -1032,6 +1064,19 @@ UINT CChopStickDlg::Procedure()
 	//检查是否到位
 
 	m_ChopstickCounter++;
+	//每20根记录一次文档
+	if (!(m_ChopstickCounter%20))
+	{
+		 g.rec.m_record_total = g.rec_bak.m_record_total = m_total;
+		 g.rec.m_record_up = g.rec_bak.m_record_up = m_up;
+		 g.rec.m_record_down = g.rec_bak.m_record_down = m_down;
+		 g.rec.m_record_left = g.rec_bak.m_record_left = m_left;
+		 g.rec.m_record_right = g.rec_bak.m_record_right = m_right;
+		 g.rec.m_record_void = g.rec_bak.m_record_void = m_none;
+		 g.rec.SaveParaFile(PARA_SN);
+		 g.rec_bak.SaveParaFile(PARA_SN);
+	}
+
 	m_stopCounter++;
 	if (m_stopCounter > 10) { flag = NOCHOPSTICK; g.mc.WriteOutPutBit(OUT_ALM, ON); };
 	UpdateUI();
@@ -1148,6 +1193,17 @@ void CChopStickDlg::OnClose()
 
 		}
 		d1000_board_close();
+
+
+
+		g.rec.m_record_total = g.rec_bak.m_record_total = m_total;
+		g.rec.m_record_up = g.rec_bak.m_record_up = m_up;
+		g.rec.m_record_down = g.rec_bak.m_record_down = m_down;
+		g.rec.m_record_left = g.rec_bak.m_record_left = m_left;
+		g.rec.m_record_right = g.rec_bak.m_record_right = m_right;
+		g.rec.m_record_void = g.rec_bak.m_record_void = m_none;
+		g.rec.SaveParaFile(PARA_SN);
+		g.rec_bak.SaveParaFile(PARA_SN);
 		Sleep(100);
 	}
 	else
@@ -1257,7 +1313,7 @@ void CChopStickDlg::OnSelchangeComboSeldir()
 		CComboBox *pbox = (CComboBox*)GetDlgItem(IDC_COMBO_SELDIR);
 		g.ini.m_direction = UP; pbox->SetCurSel(0);
 	}
-	g.ini.SaveParaFile(PARA_PRJ);
+	g.ini.SaveParaFile(PARA_PRJ | PARA_IMAGE | PARA_IO);
 }
 
 

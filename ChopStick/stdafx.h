@@ -126,8 +126,9 @@ public:
 
 	COpencvprocess opencv;
 	CPreferences ini;
-	
+	//记录了总数
 	CPreferences rec;
+	//因为会频繁的记录，容易文件损失，所以要进行一个备份
 	CPreferences rec_bak;
 	CMotionCard mc;
 
@@ -163,8 +164,8 @@ extern _global g;
 //#include//
 
 
-
-
+//某个客户需求
+#define NEED
 
 
 //gloabal

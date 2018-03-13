@@ -637,6 +637,17 @@ void CPreferences::LoadParaFile(UINT item)
 			m_Push_Cyl_delay = GetValueI(L"IOCARD_SETTING", L"PushCyldelay");
 			m_Push_Cyl_delay1 = GetValueI(L"IOCARD_SETTING", L"PushCyldelay1");
 		}
+
+		if (PARA_SN == (mask&PARA_SN))
+		{
+			m_record_total = GetValueI(L"PRJ_SN", L"M_RTOTAL");
+			m_record_up = GetValueI(L"PRJ_SN", L"M_RUP");
+			m_record_down = GetValueI(L"PRJ_SN", L"M_RDOWN");
+			m_record_left = GetValueI(L"PRJ_SN", L"M_RLEFT");
+			m_record_right = GetValueI(L"PRJ_SN", L"M_RRIGHT");
+			m_record_void = GetValueI(L"PRJ_SN", L"M_RVOID");
+			m_can_be_read = GetValueI(L"PRJ_SN", L"M_RREAD");
+		}
 	
 	}
 
@@ -738,10 +749,16 @@ void CPreferences::SaveParaFile(UINT item)
 
 	}
 	
-	//if(PARA_SN==(mask&PARA_SN))
-	//{
-	//	SetValue(L"PRJ_SN",L"SN",m_password); 
-	//}
+	if(PARA_SN==(mask&PARA_SN))
+	{
+		SetValueI(L"PRJ_SN", L"M_RTOTAL", m_record_total);
+		SetValueI(L"PRJ_SN", L"M_RUP", m_record_up);
+		SetValueI(L"PRJ_SN", L"M_RDOWN", m_record_down);
+		SetValueI(L"PRJ_SN", L"M_RLEFT", m_record_left);
+		SetValueI(L"PRJ_SN", L"M_RRIGHT", m_record_right);
+		SetValueI(L"PRJ_SN", L"M_RVOID", m_record_void);
+		SetValueI(L"PRJ_SN", L"M_RREAD", m_can_be_read);
+	}
 	WriteFile();
 }
 
@@ -752,7 +769,7 @@ void CPreferences::SaveParaFile(UINT item)
 void CPreferences::initData()
 {
 	//#define PARA_PRJ            (0x1<<0)
-
+	
 	m_shutter = 2500.0;
 	m_idCamera = 0;
 	m_nTriggerOutForBack = 0;

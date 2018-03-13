@@ -319,7 +319,7 @@ void Set::OnBnClickedButtonSavepara()
 
 	GetDlgItem(IDC_EDIT_STOPTIME)->GetWindowText(str);
 	g.ini.m_stoptime = _ttoi(str);
-	g.ini.SaveParaFile(PARA_ALL);
+	g.ini.SaveParaFile(PARA_PRJ | PARA_IMAGE | PARA_IO);
 }
 
 
@@ -337,7 +337,7 @@ void Set::OnBnClickedButtonSysreset()
 	GetDlgItem(IDC_EDIT_DELAYLASER)->GetWindowText(str);
 	g.ini.m_DelayLaserTrigger = _ttoi(str);
 
-	g.ini.SaveParaFile(PARA_PRJ);
+	g.ini.SaveParaFile(PARA_PRJ | PARA_IMAGE | PARA_IO);
 
 }
 
@@ -379,7 +379,7 @@ void Set::OnBnClickedButtonComfThreshold()
 	GetDlgItem(IDC_EDIT_sigmaSpace)->GetWindowText(str);
 	g.ini.sigmaSpace = _ttof(str);
 	
-	g.ini.SaveParaFile(PARA_ALL);
+	g.ini.SaveParaFile(PARA_PRJ | PARA_IMAGE | PARA_IO);
 }
 
 
@@ -463,7 +463,7 @@ void Set::OnSelchangeComboSelthemethod()
 		GetDlgItem(IDC_STATIC_THRESCOMP)->SetWindowText(L"¶þÖµ»¯²¹³¥");
 	}
 
-	g.ini.SaveParaFile(PARA_ALL);
+	g.ini.SaveParaFile(PARA_PRJ | PARA_IMAGE | PARA_IO);
 }
 
 
